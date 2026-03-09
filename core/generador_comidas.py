@@ -822,13 +822,26 @@ class ReajustadorPlan:
     def _agregar_alimento_emergencia(cls, comida_dict: dict, kcal_faltantes: float, meal_idx: int, tipo: str):
         """Agrega un alimento de emergencia para cubrir kcal faltantes."""
         if tipo == 'carbs':
+            # FIX: Carbs específicos por meal_idx con restricciones
             if meal_idx == 0:  # Desayuno: avena es válida
-                opciones = ['avena', 'pan_integral', 'granola', 'arroz_blanco', 'papa', 'camote', 'cereal_integral']
-            elif meal_idx == 3:  # Cena: sin avena, preferir ligeros
+                opciones = ['avena', 'pan_integral', 'granola', 'cereal_integral']
+            elif meal_idx == 1:  # Almuerzo: variedad sin avena
+                opciones = ['arroz_blanco', 'arroz_integral', 'papa', 'camote', 'frijoles', 'lentejas']
+            elif meal_idx == 2:  # Comida: más contundente
+                opciones = ['arroz_integral', 'pasta_integral', 'papa', 'frijoles', 'quinoa']
+            else:  # meal_idx == 3, Cena: ligeros sin avena
                 opciones = ['papa', 'camote', 'pan_integral', 'tortilla_maiz', 'quinoa', 'lentejas']
-            else:  # Almuerzo (1) y Comida (2)
-                opciones = ['arroz_blanco', 'arroz_integral', 'papa', 'camote',
-                            'tortilla_maiz', 'frijoles', 'lentejas', 'pan_integral', 'garbanzos']
+            
+            # Filtrar por disponibilidad en ALIMENTOS_BASE
+            from src.alimentos_base import ALIMENTOS_BASE
+            opciones = [c for c in opciones if c in ALIMENTOS_BASE]
+            if not opciones:
+                opciones = ['papa', 'arroz_blanco']  # fallback final
+            
+            logger.debug(
+                "[EMERGENCIA] meal_idx=%d seleccionó carbs de: %s",
+                meal_idx, opciones
+            )
         elif tipo == 'grasa':
             opciones = ['aguacate', 'nueces', 'almendras', 'aceite_de_oliva']
         else:

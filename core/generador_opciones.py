@@ -251,7 +251,17 @@ class GeneradorOpcionesEquivalentes:
         seed: int | None = None,
     ) -> List[Dict]:
         """Genera N opciones equivalentes de carbohidratos."""
+        from utils.logger import logger
+        
         penalizados = (alimentos_penalizados or {}).get('carbs', [])
+
+        # FALLBACK por comida si pool queda vacío
+        FALLBACK_CARBS_POR_COMIDA = {
+            0: ['avena', 'granola', 'pan_integral'],        # desayuno
+            1: ['arroz_blanco', 'papa', 'camote', 'tortilla_maiz'],  # almuerzo  
+            2: ['arroz_integral', 'pasta_integral', 'papa', 'frijoles'],  # comida
+            3: ['tortilla_harina', 'papa', 'camote'],       # cena
+        }
 
         prioridades = {
             0: ['avena', 'pan_integral', 'tortilla_maiz'],
@@ -260,12 +270,20 @@ class GeneradorOpcionesEquivalentes:
             3: ['papa', 'arroz_blanco', 'camote', 'tortilla_maiz'],
         }.get(meal_idx, [])
 
-        # FIX: avena es exclusiva del desayuno (meal_idx=0).
-        # Para almuerzo, comida y cena excluirla del pool de candidatos.
-        if meal_idx == 0:
-            lista_carbs = CATEGORIAS['carbs']
-        else:
-            lista_carbs = [c for c in CATEGORIAS['carbs'] if c != 'avena']
+        # FIX: Filtrar alimentos por meal_idx usando restricciones en ALIMENTOS_BASE
+        from src.alimentos_base import ALIMENTOS_BASE
+        candidatos_carbs = [
+            a for a in CATEGORIAS['carbs']
+            if a in ALIMENTOS_BASE and meal_idx in ALIMENTOS_BASE[a].get('meal_idx', [0, 1, 2, 3])
+        ]
+        
+        # Si candidatos queda vacío, usar fallback hardcoded
+        if not candidatos_carbs:
+            candidatos_carbs = FALLBACK_CARBS_POR_COMIDA.get(meal_idx, ['papa', 'arroz_blanco'])
+            logger.warning(
+                "[OPCIONES] meal_idx=%d: pool vacío, usando fallback: %s",
+                meal_idx, candidatos_carbs,
+            )
 
         # FIX: Si el objetivo es 0 o muy bajo, usar mínimo representativo
         if gramos_carbs_objetivo <= 5:
@@ -276,10 +294,10 @@ class GeneradorOpcionesEquivalentes:
             )
             gramos_carbs_objetivo = 30.0
 
-        return GeneradorOpcionesEquivalentes._generar_opciones_macro(
+        opciones = GeneradorOpcionesEquivalentes._generar_opciones_macro(
             macro_objetivo=gramos_carbs_objetivo,
             tipo_macro='carbs',
-            lista_alimentos=lista_carbs,
+            lista_alimentos=candidatos_carbs,
             prioridades_comida=prioridades,
             meal_idx=meal_idx,
             num_opciones=num_opciones,
@@ -288,6 +306,14 @@ class GeneradorOpcionesEquivalentes:
             seed_offset=100,
             umbral_minimo=0.4,  # FIX: bajado de 0.5 para mayor tolerancia
         )
+        
+        # Debug log para facilitar debugging
+        logger.debug(
+            "[OPCIONES] meal_idx=%d generó %d opciones de carbs: %s",
+            meal_idx, len(opciones), [o['alimento'] for o in opciones]
+        )
+        
+        return opciones
 
     @staticmethod
     def generar_opciones_grasas(

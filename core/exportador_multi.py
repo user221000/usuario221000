@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-import pandas as pd
-
 from src.alimentos_base import ALIMENTOS_BASE
 
 _COMIDAS_ORDEN = ["desayuno", "almuerzo", "comida", "cena"]
@@ -26,6 +24,8 @@ class ExportadorMultiformato:
           3. Lista de Compras — totales agrupados por alimento
           4. Macros Detallados — proteínas, carbs, grasas y kcal reales
         """
+        import pandas as pd
+        
         with pd.ExcelWriter(ruta_salida, engine="xlsxwriter") as writer:
             wb = writer.book
 
@@ -144,6 +144,8 @@ class ExportadorMultiformato:
     @staticmethod
     def a_csv_simple(plan, ruta_salida: str) -> str:
         """CSV simple para impresión rápida (compatible con Excel vía utf-8-sig)."""
+        import pandas as pd
+        
         rows = []
         for comida, datos in plan.items():
             if comida == "metadata_mes_anterior":
@@ -163,7 +165,132 @@ class ExportadorMultiformato:
 # Helpers                                                                    #
 # ────────────────────────────────────────────────────────────────────────── #
 
-def _autofit(sheet, df: pd.DataFrame, fmt_header) -> None:
+    @staticmethod
+    def exportar_seguimiento_cliente(id_cliente: str, nombre_cliente: str, planes: list) -> str:
+        """
+        Exporta el seguimiento completo de un cliente con historial de planes usando CSV básico.
+        
+        Args:
+            id_cliente: ID único del cliente
+            nombre_cliente: Nombre del cliente para el archivo
+            planes: Lista de diccionarios con historial de planes generados
+            
+        Returns:
+            str: Ruta del archivo CSV generado
+        """
+        import os
+        import csv
+        from config.constantes import CARPETA_SALIDA
+        from utils.logger import logger
+        
+        # Preparar nombre de archivo seguro
+        nombre_limpio = "".join(c for c in nombre_cliente if c.isalnum() or c in (' ', '-', '_')).rstrip()
+        fecha = datetime.now().strftime("%Y%m%d_%H%M%S")
+        nombre_archivo = f"seguimiento_{nombre_limpio}_{fecha}.csv"
+        ruta_salida = os.path.join(CARPETA_SALIDA, nombre_archivo)
+        
+        # Asegurar directorio
+        os.makedirs(CARPETA_SALIDA, exist_ok=True)
+        
+        # Validar que hay datos
+        if not planes:
+            logger.warning("[EXPORT] No hay planes para exportar para cliente %s", id_cliente)
+            # Crear archivo vacío con headers mínimos
+            with open(ruta_salida, 'w', newline='', encoding='utf-8-sig') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(['Cliente', 'ID', 'Estado'])
+                writer.writerow([nombre_cliente, id_cliente, 'Sin planes generados'])
+            return ruta_salida
+            
+        # Ordenar planes por fecha
+        planes_ordenados = sorted(planes, key=lambda p: p.get('fecha_generacion', ''))
+        
+        # Headers para CSV de seguimiento
+        headers = [
+            'Fecha', 'Objetivo', 'Kcal Objetivo', 'Peso (kg)', 'Grasa (%)',
+            'TMB', 'GET', 'Proteínas (g)', 'Carbohidratos (g)', 'Grasas (g)'
+        ]
+        
+        try:
+            with open(ruta_salida, 'w', newline='', encoding='utf-8-sig') as csvfile:
+                writer = csv.writer(csvfile)
+                
+                # Escribir información del cliente como encabezado
+                writer.writerow([f"SEGUIMIENTO NUTRICIONAL: {nombre_cliente}"])
+                writer.writerow([f"ID Cliente: {id_cliente}"])
+                writer.writerow([f"Total Planes: {len(planes)}"])
+                writer.writerow([f"Reporte generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}"])
+                writer.writerow([])  # Línea vacía
+                
+                # Headers de datos
+                writer.writerow(headers)
+                
+                # Datos del historial
+                for plan in planes_ordenados:
+                    # Formatear fecha
+                    fecha_gen = plan.get('fecha_generacion', '')
+                    if fecha_gen:
+                        try:
+                            fecha_obj = datetime.fromisoformat(fecha_gen.replace('Z', '+00:00'))
+                            fecha_str = fecha_obj.strftime('%d/%m/%Y')
+                        except:
+                            fecha_str = str(fecha_gen)[:10]
+                    else:
+                        fecha_str = 'Sin fecha'
+                        
+                    fila = [
+                        fecha_str,
+                        plan.get('objetivo', 'N/A').title(),
+                        plan.get('kcal_objetivo', 0),
+                        plan.get('peso_en_momento', 0),
+                        plan.get('grasa_en_momento', 0),
+                        plan.get('tmb', 0),
+                        plan.get('get_total', 0),
+                        round(plan.get('proteinas_g', 0), 1),
+                        round(plan.get('carbohidratos_g', 0), 1),
+                        round(plan.get('grasas_g', 0), 1)
+                    ]
+                    writer.writerow(fila)
+                
+                # Sección de evolución del peso si hay múltiples planes
+                if len(planes_ordenados) > 1:
+                    writer.writerow([])  # Línea vacía
+                    writer.writerow(["EVOLUCIÓN DEL PESO"])
+                    writer.writerow(["Fecha", "Peso (kg)", "Cambio (kg)", "% Cambio"])
+                    
+                    peso_inicial = planes_ordenados[0].get('peso_en_momento', 0) if planes_ordenados else 0
+                    
+                    for plan in planes_ordenados:
+                        fecha_gen = plan.get('fecha_generacion', '')
+                        if fecha_gen:
+                            try:
+                                fecha_obj = datetime.fromisoformat(fecha_gen.replace('Z', '+00:00'))
+                                fecha_str = fecha_obj.strftime('%d/%m/%Y')
+                            except:
+                                fecha_str = str(fecha_gen)[:10]
+                        else:
+                            fecha_str = 'Sin fecha'
+                            
+                        peso_actual = plan.get('peso_en_momento', 0)
+                        cambio = peso_actual - peso_inicial if peso_inicial > 0 else 0
+                        pct_cambio = (cambio / peso_inicial * 100) if peso_inicial > 0 else 0
+                        
+                        writer.writerow([
+                            fecha_str,
+                            peso_actual,
+                            round(cambio, 1),
+                            f"{pct_cambio:.1f}%"
+                        ])
+                        
+        except Exception as e:
+            logger.error("[EXPORT] Error creando CSV de seguimiento: %s", e)
+            raise
+        
+        logger.info("[EXPORT] Seguimiento cliente exportado: %s", nombre_archivo)
+        return ruta_salida
+
+
+def _autofit(sheet, df, fmt_header) -> None:
     """Aplica ancho automático y formato de encabezado."""
     for col_idx, col_name in enumerate(df.columns):
         width = max(len(str(col_name)), df[col_name].astype(str).map(len).max()

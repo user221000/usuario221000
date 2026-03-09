@@ -1,4 +1,4 @@
-"""Interfaz gráfica CustomTkinter para Método Base."""
+﻿"""Interfaz grÃ¡fica CustomTkinter para MÃ©todo Base."""
 import os
 import re
 import threading
@@ -21,9 +21,9 @@ from core.exportador_salida import GeneradorPDFProfesional
 from core.exportador_multi import ExportadorMultiformato
 
 
-# ─────────────────────────────────────────────
-# Validación de campos en tiempo real
-# ─────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ValidaciÃ³n de campos en tiempo real
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 from gui.validadores import ValidadorCamposTiempoReal  # noqa: E402
 from gui.widgets_progress import ProgressIndicator     # noqa: E402
@@ -32,24 +32,25 @@ from gui.widgets_toast import mostrar_toast            # noqa: E402
 from core.branding import branding                     # noqa: E402
 from src.gestor_bd import GestorBDClientes              # noqa: E402
 from gui.ventana_admin import VentanaAdmin              # noqa: E402
-from utils.logger import logger                        # noqa: E402
+from gui.ventana_clientes import VentanaClientes        # noqa: E402
+from utils.logger import logger                         # noqa: E402
 
 
 
 class GymApp(ctk.CTk):
-    """Aplicacion principal con CustomTkinter - Diseño profesional moderno."""
+    """Aplicacion principal con CustomTkinter - DiseÃ±o profesional moderno."""
 
-    # ── Paleta de colores WCAG 2.1 AA ──────────────────────────────────
-    # Todos los pares texto/fondo cumplen ratio mínimo 4.5:1
+    # â”€â”€ Paleta de colores WCAG 2.1 AA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # Todos los pares texto/fondo cumplen ratio mÃ­nimo 4.5:1
     COLOR_BG           = "#0D0D0D"   # Fondo principal
     COLOR_CARD         = "#1A1A1A"   # Fondo de cards
-    COLOR_PRIMARY      = "#9B4FB0"   # Morado — ratio 6.18:1 sobre BG ✅
+    COLOR_PRIMARY      = "#9B4FB0"   # Morado â€” ratio 6.18:1 sobre BG âœ…
     COLOR_PRIMARY_HOVER = "#B565C6"
     COLOR_SECONDARY    = "#D4A84B"
     COLOR_SECONDARY_HOVER = "#E4B85B"
     COLOR_BORDER       = "#444444"
-    COLOR_TEXT         = "#F5F5F5"   # Blanco — ratio 19.77:1 sobre BG ✅
-    COLOR_TEXT_MUTED   = "#B8B8B8"   # Gris — ratio 9.42:1 sobre BG  ✅
+    COLOR_TEXT         = "#F5F5F5"   # Blanco â€” ratio 19.77:1 sobre BG âœ…
+    COLOR_TEXT_MUTED   = "#B8B8B8"   # Gris â€” ratio 9.42:1 sobre BG  âœ…
     COLOR_INPUT_BG     = "#2A2A2A"
     COLOR_SUCCESS      = "#4CAF50"   # Verde Material Design
     COLOR_SUCCESS_HOVER = "#43A047"
@@ -95,7 +96,7 @@ class GymApp(ctk.CTk):
         )
         self.main_container.pack(fill="both", expand=True, padx=0, pady=0)
         
-        # ═══════════════ HEADER / BRANDING ═══════════════
+        # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• HEADER / BRANDING â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         self.header_frame = ctk.CTkFrame(self.main_container, fg_color="transparent")
         self.header_frame.pack(fill="x", pady=(20, 4))
         
@@ -131,21 +132,21 @@ class GymApp(ctk.CTk):
         self.separator = ctk.CTkFrame(self.main_container, height=2, fg_color=self.COLOR_PRIMARY)
         self.separator.pack(fill="x", padx=60, pady=(0, 12))
 
-        # ═══════════════ SECCIÓN 1: DATOS DEL CLIENTE ═══════════════
-        self.section_cliente = self._crear_seccion("Datos del Cliente", "👤")
+        # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SECCIÃ“N 1: DATOS DEL CLIENTE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        self.section_cliente = self._crear_seccion("Datos del Cliente", "ðŸ‘¤")
         
         self.entry_nombre, self.lbl_error_nombre = self._crear_input_full(
-            self.section_cliente, "Nombre completo", "Ej: Oscar Hernández", row=0
+            self.section_cliente, "Nombre completo", "Ej: Oscar HernÃ¡ndez", row=0
         )
 
         self.entry_telefono, self.entry_edad, self.lbl_error_telefono, self.lbl_error_edad = self._crear_input_duo(
             self.section_cliente,
-            "Teléfono", "Ej: 5213312345678",
+            "TelÃ©fono", "Ej: 5213312345678",
             "Edad", "Ej: 25", row=1
         )
 
-        # ═══════════════ SECCIÓN 2: MEDIDAS CORPORALES ═══════════════
-        self.section_medidas = self._crear_seccion("Medidas Corporales", "⚖")
+        # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SECCIÃ“N 2: MEDIDAS CORPORALES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        self.section_medidas = self._crear_seccion("Medidas Corporales", "âš–")
         
         self.entry_peso, self.entry_estatura, self.lbl_error_peso, self.lbl_error_estatura = self._crear_input_duo(
             self.section_medidas,
@@ -157,8 +158,8 @@ class GymApp(ctk.CTk):
             self.section_medidas, "Grasa corporal (%)", "Ej: 18", row=1
         )
 
-        # ═══════════════ SECCIÓN 3: PERFIL DE ENTRENAMIENTO ═══════════════
-        self.section_perfil = self._crear_seccion("Perfil de Entrenamiento", "🏋")
+        # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SECCIÃ“N 3: PERFIL DE ENTRENAMIENTO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        self.section_perfil = self._crear_seccion("Perfil de Entrenamiento", "ðŸ‹")
         
         self.combo_actividad, self.combo_objetivo = self._crear_combo_duo(
             self.section_perfil,
@@ -166,7 +167,7 @@ class GymApp(ctk.CTk):
             "Objetivo", list(OBJETIVOS_VALIDOS), "mantenimiento", row=0
         )
 
-        # ═══════════════ SECCIÓN 4: TIPO DE PLAN ═══════════════
+        # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SECCIÃ“N 4: TIPO DE PLAN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         self.frame_tipo_plan = ctk.CTkFrame(
             self.main_container, fg_color=self.COLOR_CARD,
             corner_radius=12, border_width=1, border_color=self.COLOR_BORDER
@@ -186,7 +187,7 @@ class GymApp(ctk.CTk):
 
         self.segmented_tipo_plan = ctk.CTkSegmentedButton(
             self.frame_tipo_plan_inner,
-            values=["Menú Fijo", "Con Opciones"],
+            values=["MenÃº Fijo", "Con Opciones"],
             command=self._cambiar_tipo_plan,
             font=ctk.CTkFont(size=12),
             fg_color=self.COLOR_INPUT_BG,
@@ -195,12 +196,12 @@ class GymApp(ctk.CTk):
             unselected_color=self.COLOR_CARD,
             unselected_hover_color=self.COLOR_BORDER
         )
-        self.segmented_tipo_plan.set("Menú Fijo")
+        self.segmented_tipo_plan.set("MenÃº Fijo")
         self.segmented_tipo_plan.pack(side="left", fill="x", expand=True)
 
         self.lbl_info_tipo = ctk.CTkLabel(
             self.frame_tipo_plan_inner,
-            text="ℹ️",
+            text="â„¹ï¸",
             font=ctk.CTkFont(size=14),
             text_color=self.COLOR_TEXT_MUTED,
             cursor="hand2"
@@ -208,7 +209,7 @@ class GymApp(ctk.CTk):
         self.lbl_info_tipo.pack(side="left", padx=(10, 0))
         self.lbl_info_tipo.bind("<Button-1>", self._mostrar_info_tipo_plan)
 
-        # ─── Bindings de validación en tiempo real ───
+        # â”€â”€â”€ Bindings de validaciÃ³n en tiempo real â”€â”€â”€
         self.entry_nombre.bind("<KeyRelease>", lambda e: self._validar_campo(
             self.entry_nombre, self.lbl_error_nombre, ValidadorCamposTiempoReal.validar_nombre))
         self.entry_telefono.bind("<KeyRelease>", lambda e: self._validar_campo(
@@ -247,6 +248,7 @@ class GymApp(ctk.CTk):
         self.secondary_buttons.pack(fill="x")
         self.secondary_buttons.grid_columnconfigure(0, weight=1)
         self.secondary_buttons.grid_columnconfigure(1, weight=1)
+        self.secondary_buttons.grid_columnconfigure(2, weight=1)  # AÃ±adir tercera columna
 
         self.btn_whatsapp = ctk.CTkButton(
             self.secondary_buttons, text="Enviar por WhatsApp",
@@ -257,7 +259,7 @@ class GymApp(ctk.CTk):
             border_width=1, border_color=self.COLOR_SUCCESS_HOVER,
             text_color=self.COLOR_TEXT
         )
-        self.btn_whatsapp.grid(row=0, column=0, sticky="ew", padx=(0, 8), pady=0)
+        self.btn_whatsapp.grid(row=0, column=0, sticky="ew", padx=(0, 4), pady=0)
 
         self.btn_abrir_pdf = ctk.CTkButton(
             self.secondary_buttons, text="Abrir carpeta de PDF",
@@ -267,14 +269,25 @@ class GymApp(ctk.CTk):
             border_width=1, border_color=self.COLOR_BORDER,
             text_color=self.COLOR_TEXT_MUTED
         )
-        self.btn_abrir_pdf.grid(row=0, column=1, sticky="ew", padx=(8, 0), pady=0)
+        self.btn_abrir_pdf.grid(row=0, column=1, sticky="ew", padx=(4, 4), pady=0)
+        
+        # Nuevo botÃ³n Mis Clientes
+        self.btn_clientes = ctk.CTkButton(
+            self.secondary_buttons, text="ðŸ‘¥ Mis Clientes",
+            command=self._abrir_clientes, height=36, corner_radius=6,
+            font=ctk.CTkFont(family="Segoe UI", size=12),
+            fg_color=self.COLOR_INFO, hover_color="#1976D2",
+            border_width=1, border_color=self.COLOR_INFO,
+            text_color="white"
+        )
+        self.btn_clientes.grid(row=0, column=2, sticky="ew", padx=(4, 0), pady=0)
 
-        # ═══════════════ PROGRESO ═══════════════
+        # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PROGRESO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         self.progress_indicator = ProgressIndicator(self.main_container)
         self.progress_indicator.pack(fill="x", padx=40, pady=(0, 8))
         self.progress_indicator.pack_forget()  # oculto hasta que se genere
 
-        # ═══════════════ REGISTRO DE OPERACIONES ═══════════════
+        # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• REGISTRO DE OPERACIONES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         self.log_frame = ctk.CTkFrame(
             self.main_container, fg_color=self.COLOR_CARD,
             corner_radius=10, border_width=1, border_color=self.COLOR_BORDER
@@ -298,7 +311,7 @@ class GymApp(ctk.CTk):
         
         self._log("Sistema listo. Esperando datos del cliente...")
 
-    # ───── Helpers de creación de UI ─────
+    # â”€â”€â”€â”€â”€ Helpers de creaciÃ³n de UI â”€â”€â”€â”€â”€
 
     def _crear_seccion(self, titulo, icono=""):
         card = ctk.CTkFrame(
@@ -478,28 +491,28 @@ class GymApp(ctk.CTk):
         except Exception:
             pass
 
-    # ───── Lógica de negocio ─────
+    # â”€â”€â”€â”€â”€ LÃ³gica de negocio â”€â”€â”€â”€â”€
 
     def _validar_campo(self, entry, lbl_error, validador_fn, opcional: bool = False):
-        """Actualiza borde y etiqueta de un campo; muestra ✓ o ✗; actualiza botón."""
+        """Actualiza borde y etiqueta de un campo; muestra âœ“ o âœ—; actualiza botÃ³n."""
         valor = entry.get()
         ok, mensaje = validador_fn(valor)
 
         if not valor.strip() and opcional:
-            # Campo opcional vacío → neutro
+            # Campo opcional vacÃ­o â†’ neutro
             entry.configure(border_color=self.COLOR_BORDER)
             lbl_error.configure(text="", text_color=self.COLOR_TEXT_MUTED)
         elif ok:
             entry.configure(border_color=self.COLOR_SUCCESS)
-            lbl_error.configure(text="✓", text_color=self.COLOR_SUCCESS)
+            lbl_error.configure(text="âœ“", text_color=self.COLOR_SUCCESS)
         else:
             entry.configure(border_color=self.COLOR_ERROR)
-            lbl_error.configure(text=f"✗ {mensaje}", text_color=self.COLOR_ERROR)
+            lbl_error.configure(text=f"âœ— {mensaje}", text_color=self.COLOR_ERROR)
 
         self._actualizar_estado_boton_generar()
 
     def _actualizar_estado_boton_generar(self):
-        """Habilita / deshabilita el botón de generar según validez del formulario."""
+        """Habilita / deshabilita el botÃ³n de generar segÃºn validez del formulario."""
         todos_validos = all([
             ValidadorCamposTiempoReal.validar_nombre(self.entry_nombre.get())[0],
             ValidadorCamposTiempoReal.validar_edad(self.entry_edad.get())[0],
@@ -513,7 +526,7 @@ class GymApp(ctk.CTk):
             self.btn_procesar.configure(state="disabled", fg_color=self.COLOR_TEXT_MUTED)
 
     def _mostrar_toast(self, mensaje: str, tipo: str = "info", duracion: int = 3000):
-        """Muestra una notificación toast en la esquina superior derecha."""
+        """Muestra una notificaciÃ³n toast en la esquina superior derecha."""
         mostrar_toast(self, mensaje, tipo=tipo, duracion=duracion)
 
     def _log(self, mensaje):
@@ -526,24 +539,24 @@ class GymApp(ctk.CTk):
         logger.info("[GUI] Tipo de plan cambiado a: %s", value)
         if value == "Con Opciones":
             self._mostrar_toast(
-                "Plan con Opciones: El cliente podrá elegir entre alternativas equivalentes",
+                "Plan con Opciones: El cliente podrÃ¡ elegir entre alternativas equivalentes",
                 tipo='info', duracion=4000,
             )
 
     def _mostrar_info_tipo_plan(self, event=None):
-        """Muestra información detallada sobre tipos de plan."""
+        """Muestra informaciÃ³n detallada sobre tipos de plan."""
         info = (
             "TIPOS DE PLAN:\n\n"
-            "MENÚ FIJO:\n"
-            "• Plan con alimentos específicos\n"
-            "• Cliente sigue instrucciones exactas\n"
-            "• Máximo control nutricional\n"
-            "• Ideal para principiantes\n\n"
+            "MENÃš FIJO:\n"
+            "â€¢ Plan con alimentos especÃ­ficos\n"
+            "â€¢ Cliente sigue instrucciones exactas\n"
+            "â€¢ MÃ¡ximo control nutricional\n"
+            "â€¢ Ideal para principiantes\n\n"
             "CON OPCIONES:\n"
-            "• 3 alternativas por macronutriente\n"
-            "• Cliente elige según disponibilidad\n"
-            "• Mayor flexibilidad y adherencia\n"
-            "• Requiere educación nutricional básica\n\n"
+            "â€¢ 3 alternativas por macronutriente\n"
+            "â€¢ Cliente elige segÃºn disponibilidad\n"
+            "â€¢ Mayor flexibilidad y adherencia\n"
+            "â€¢ Requiere educaciÃ³n nutricional bÃ¡sica\n\n"
             "Ambos garantizan el mismo balance nutricional."
         )
         messagebox.showinfo("Tipos de Plan", info)
@@ -560,7 +573,7 @@ class GymApp(ctk.CTk):
     def _procesar_datos(self):
         try:
             self._log("Iniciando procesamiento...")
-            self.after(0, lambda: self.progress_indicator.set_progress(0.05, "Validando datos…"))
+            self.after(0, lambda: self.progress_indicator.set_progress(0.05, "Validando datosâ€¦"))
 
             nombre = self.entry_nombre.get().strip()
             if not nombre:
@@ -589,7 +602,7 @@ class GymApp(ctk.CTk):
             # Determinar tipo de plan seleccionado
             tipo_plan = self.segmented_tipo_plan.get()
 
-            self.after(0, lambda: self.progress_indicator.set_progress(0.2, "Calculando metabolismo…"))
+            self.after(0, lambda: self.progress_indicator.set_progress(0.2, "Calculando metabolismoâ€¦"))
 
             cliente = ClienteEvaluacion(
                 nombre=nombre,
@@ -603,13 +616,13 @@ class GymApp(ctk.CTk):
 
             cliente = MotorNutricional.calcular_motor(cliente)
             self._log(f"TMB={cliente.tmb:.0f}, GET={cliente.get_total:.0f}, Kcal={cliente.kcal_objetivo:.0f}")
-            self.after(0, lambda: self.progress_indicator.set_progress(0.45, "Construyendo plan alimenticio…"))
+            self.after(0, lambda: self.progress_indicator.set_progress(0.45, "Construyendo plan alimenticioâ€¦"))
 
             dir_planes = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "planes")
             os.makedirs(dir_planes, exist_ok=True)
 
             if tipo_plan == "Con Opciones":
-                # ── Modo opciones: generar plan con alternativas ──
+                # â”€â”€ Modo opciones: generar plan con alternativas â”€â”€
                 from core.generador_opciones import ConstructorPlanConOpciones
                 from core.exportador_opciones import GeneradorPDFConOpciones
 
@@ -621,7 +634,7 @@ class GymApp(ctk.CTk):
                     num_opciones_por_macro=3,
                 )
                 self._log("Plan con opciones estructurado correctamente.")
-                self.after(0, lambda: self.progress_indicator.set_progress(0.80, "Generando PDF…"))
+                self.after(0, lambda: self.progress_indicator.set_progress(0.80, "Generando PDFâ€¦"))
 
                 if not os.path.exists(CARPETA_SALIDA):
                     os.makedirs(CARPETA_SALIDA)
@@ -647,14 +660,14 @@ class GymApp(ctk.CTk):
                     self._log("No se pudo generar Excel: %s" % exc)
 
             else:
-                # ── Modo fijo: flujo original completo ──
-                self._log("Generando plan con menú FIJO...")
+                # â”€â”€ Modo fijo: flujo original completo â”€â”€
+                self._log("Generando plan con menÃº FIJO...")
 
                 plan = ConstructorPlanNuevo.construir(cliente, plan_numero=1, directorio_planes=dir_planes)
                 self._log("Plan nutricional estructurado correctamente.")
-                self.after(0, lambda: self.progress_indicator.set_progress(0.65, "Mostrando vista previa…"))
+                self.after(0, lambda: self.progress_indicator.set_progress(0.65, "Mostrando vista previaâ€¦"))
 
-                # ── Vista previa: bloquear hilo hasta confirmación ──
+                # â”€â”€ Vista previa: bloquear hilo hasta confirmaciÃ³n â”€â”€
                 confirm_event = threading.Event()
                 self._preview_confirmed = False
 
@@ -670,10 +683,10 @@ class GymApp(ctk.CTk):
                 confirm_event.wait()
 
                 if not self._preview_confirmed:
-                    self._log("Generación cancelada por el usuario.")
+                    self._log("GeneraciÃ³n cancelada por el usuario.")
                     return
 
-                self.after(0, lambda: self.progress_indicator.set_progress(0.80, "Generando PDF…"))
+                self.after(0, lambda: self.progress_indicator.set_progress(0.80, "Generando PDFâ€¦"))
 
                 if not os.path.exists(CARPETA_SALIDA):
                     os.makedirs(CARPETA_SALIDA)
@@ -700,8 +713,8 @@ class GymApp(ctk.CTk):
 
             self.after(0, lambda: self.btn_abrir_pdf.configure(state="normal" if self.ultimo_pdf else "disabled"))
             self.after(0, lambda: self.btn_whatsapp.configure(state="normal" if self.ultimo_pdf else "disabled"))
-            self.after(0, lambda: self.progress_indicator.complete("✓ Plan generado y PDF listo"))
-            self.after(0, lambda: self._mostrar_toast("✓ PDF generado exitosamente", tipo="success"))
+            self.after(0, lambda: self.progress_indicator.complete("âœ“ Plan generado y PDF listo"))
+            self.after(0, lambda: self._mostrar_toast("âœ“ PDF generado exitosamente", tipo="success"))
 
             if self.ultimo_pdf:
                 try:
@@ -710,7 +723,7 @@ class GymApp(ctk.CTk):
                 except Exception as exc:
                     self._log("No se pudo abrir la carpeta del PDF: %s" % exc)
 
-            # Estadísticas y registro en BD
+            # EstadÃ­sticas y registro en BD
             comidas = ['desayuno', 'almuerzo', 'comida', 'cena']
             if tipo_plan == "Con Opciones":
                 kcal_total = sum(
@@ -718,7 +731,7 @@ class GymApp(ctk.CTk):
                     for c in comidas if c in plan
                 )
                 self._log(
-                    f"PLAN OPCIONES — {nombre} | {objetivo.upper()} | "
+                    f"PLAN OPCIONES â€” {nombre} | {objetivo.upper()} | "
                     f"Kcal obj: {cliente.kcal_objetivo:.0f} | "
                     f"Tipo: Con Opciones"
                 )
@@ -726,27 +739,42 @@ class GymApp(ctk.CTk):
                 kcal_real = sum(plan[c].get('kcal_real', 0) for c in comidas if c in plan)
                 desv_max = max(plan[c].get('desviacion_pct', 0) for c in comidas if c in plan)
                 self._log(
-                    f"PLAN GENERADO — {nombre} | {objetivo.upper()} | "
+                    f"PLAN GENERADO â€” {nombre} | {objetivo.upper()} | "
                     f"Kcal obj: {cliente.kcal_objetivo:.0f} | "
-                    f"Kcal real: {kcal_real:.0f} | Desv. máx: {desv_max:.2f}%"
+                    f"Kcal real: {kcal_real:.0f} | Desv. mÃ¡x: {desv_max:.2f}%"
                 )
 
-            # Registrar cliente y plan en BD
+            # Registrar cliente y plan en BD con manejo de errores
             if self.gestor_bd:
-                self.gestor_bd.registrar_cliente(cliente)
-                if self.ultimo_pdf:
-                    self.gestor_bd.registrar_plan_generado(cliente, plan, self.ultimo_pdf)
+                try:
+                    # a) Registrar o actualizar cliente
+                    success_cliente = self.gestor_bd.registrar_cliente(cliente)
+                    if success_cliente:
+                        self._log("Cliente registrado en BD exitosamente")
+                    else:
+                        self._log("Advertencia: No se pudo registrar cliente en BD")
+                    
+                    # b) Registrar el plan generado
+                    if self.ultimo_pdf:
+                        success_plan = self.gestor_bd.registrar_plan_generado(cliente, plan, self.ultimo_pdf)
+                        if success_plan:
+                            self._log("Plan registrado en BD exitosamente")
+                        else:
+                            self._log("Advertencia: No se pudo registrar plan en BD")
+                except Exception as e:
+                    logger.warning("[BD] Error al guardar en BD: %s", e)
+                    self._log(f"Advertencia BD: {e}")
 
             self._log(f"PDF: {ruta_pdf}")
 
         except ValueError as ve:
             self._log(f"Error de validacion: {ve}")
-            self.after(0, lambda: self._mostrar_toast(f"⚠️ {ve}", tipo="warning", duracion=5000))
+            self.after(0, lambda: self._mostrar_toast(f"âš ï¸ {ve}", tipo="warning", duracion=5000))
             self.after(0, lambda: messagebox.showerror(
-                "Error de Validación", f"Por favor verifica los datos.\nDetalle: {ve}"))
+                "Error de ValidaciÃ³n", f"Por favor verifica los datos.\nDetalle: {ve}"))
         except Exception as e:
             self._log(f"ERROR: {str(e)}")
-            self.after(0, lambda: self._mostrar_toast(f"❌ Error: {str(e)}", tipo="error", duracion=5000))
+            self.after(0, lambda: self._mostrar_toast(f"âŒ Error: {str(e)}", tipo="error", duracion=5000))
             self.after(0, lambda: messagebox.showerror("Error", f"Ocurrio un error:\n{str(e)}"))
             import traceback
             traceback.print_exc()
@@ -805,24 +833,24 @@ class GymApp(ctk.CTk):
             return
         telefono = self.entry_telefono.get().strip()
         if not telefono.isdigit():
-            messagebox.showerror("Error", "Teléfono inválido.")
+            messagebox.showerror("Error", "TelÃ©fono invÃ¡lido.")
             return
         if not telefono.startswith("52"):
-            messagebox.showerror("Error", "El número debe iniciar con 52 (México).")
+            messagebox.showerror("Error", "El nÃºmero debe iniciar con 52 (MÃ©xico).")
             return
         nombre = self.entry_nombre.get().strip()
 
         nombre_gym = branding.get('nombre_gym', 'el gimnasio')
         telefono_gym = branding.get('contacto.telefono', '')
         mensaje = (
-            f"Hola {nombre} 👋\n\n"
-            f"Tu plan personalizado de {nombre_gym} ya está listo.\n"
-            f"Adjunto encontrarás tu plan alimenticio.\n"
-            f"Cualquier duda consúltala con tu entrenador.\n"
-            f"{nombre_gym} agradece tu preferencia y te espera el próximo mes con tu plan actualizado."
+            f"Hola {nombre} ðŸ‘‹\n\n"
+            f"Tu plan personalizado de {nombre_gym} ya estÃ¡ listo.\n"
+            f"Adjunto encontrarÃ¡s tu plan alimenticio.\n"
+            f"Cualquier duda consÃºltala con tu entrenador.\n"
+            f"{nombre_gym} agradece tu preferencia y te espera el prÃ³ximo mes con tu plan actualizado."
         )
         if telefono_gym:
-            mensaje += f"\n📞 {telefono_gym}"
+            mensaje += f"\nðŸ“ž {telefono_gym}"
 
         mensaje_codificado = urllib.parse.quote(mensaje)
         url = f"https://wa.me/{telefono}?text={mensaje_codificado}"
@@ -830,13 +858,27 @@ class GymApp(ctk.CTk):
         
         messagebox.showinfo(
             "WhatsApp",
-            "WhatsApp Web abierto. Adjunta el PDF manualmente y envía."
+            "WhatsApp Web abierto. Adjunta el PDF manualmente y envÃ­a."
         )
 
     def _abrir_panel_admin(self, event=None):
-        """Abre el panel de administración (atajo: Ctrl+Shift+A)."""
+        """Abre el panel de administraciÃ³n (atajo: Ctrl+Shift+A)."""
         try:
             VentanaAdmin(self)
         except Exception as e:
             logger.error("[APP] Error abriendo panel admin: %s", e, exc_info=True)
             messagebox.showerror("Error", f"No se pudo abrir el panel:\n{e}")
+
+    def _abrir_clientes(self):
+        """Abre la ventana de gestiÃ³n de clientes."""
+        if not self.gestor_bd:
+            messagebox.showerror("Error", "Sistema de BD no disponible")
+            return
+
+        try:
+            ventana = VentanaClientes(self, self.gestor_bd)
+            ventana.focus()
+        except Exception as e:
+            logger.error("[APP] Error abriendo ventana clientes: %s", e)
+            messagebox.showerror("Error", f"No se pudo abrir Mis Clientes:\n{e}")
+
