@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Ventana de reportes y estadísticas avanzadas.
 

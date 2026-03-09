@@ -20,6 +20,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from utils.helpers import resource_path
 from config.constantes import RUTA_LOGO
 from utils.logger import logger
+from core.branding import branding
 
 # Registrar fuente (idempotente: si ya está registrada no falla)
 _font_inter_bolditalic = resource_path("fonts/Inter_18pt-BoldItalic.ttf")
@@ -69,20 +70,20 @@ class GeneradorPDFConOpciones:
         y_pos = header_top
         c.setFillColor(colors.black)
         c.setFont(_FONT, 16)
-        c.drawString(margin_x, y_pos, "FitnessGym Real del Valle")
+        c.drawString(margin_x, y_pos, branding.get('nombre_gym', 'Gimnasio'))
         y_pos -= 15
 
         c.setFont(_FONT, 9)
-        c.drawString(margin_x, y_pos, "C. Valle De San José 1329B")
+        c.drawString(margin_x, y_pos, branding.get('contacto.direccion_linea1', ''))
         y_pos -= 11
-        c.drawString(margin_x, y_pos, "Fraccionamiento Real del Valle")
+        c.drawString(margin_x, y_pos, branding.get('contacto.direccion_linea2', ''))
         y_pos -= 11
-        c.drawString(margin_x, y_pos, "45654 Tlajomulco de Zúñiga, Jal.")
+        c.drawString(margin_x, y_pos, branding.get('contacto.direccion_linea3', ''))
         y_pos -= 13
 
         c.setFont(_FONT, 8)
         c.setFillColor(colors.HexColor("#888888"))
-        c.drawString(margin_x, y_pos, "@fitnessgym_realdelvalle")
+        c.drawString(margin_x, y_pos, branding.get('redes_sociales.instagram', ''))
         y_pos -= 14
 
         # Logo (derecha)

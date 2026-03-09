@@ -1,7 +1,7 @@
 {
-  "nombre_gym": "fitnessgymrealdelvalle",
+  "nombre_gym": "FitnessGym Real del Valle",
   "nombre_corto": "Método Base",
-  "tagline": "Powered by Consultoría Hernández",
+  "tagline": "Método Base by Consultoría Hernández",
   "colores": {
     "primario": "#ff0006",
     "primario_hover": "#B565C6",
@@ -12,11 +12,14 @@
     "telefono": "5217441614117",
     "email": "oscar_autumn@outlook.com",
     "direccion": "",
+    "direccion_linea1": "C. Valle De San José 1329B",
+    "direccion_linea2": "Fraccionamiento Real del Valle",
+    "direccion_linea3": "45654 Tlajomulco de Zúñiga, Jal.",
     "whatsapp": "5217441614117"
   },
   "redes_sociales": {
     "facebook": "",
-    "instagram": "",
+    "instagram": "@fitnessgym_realdelvalle",
     "tiktok": ""
   },
   "logo": {

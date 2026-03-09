@@ -33,6 +33,9 @@ class GestorBranding:
             "telefono": "",
             "email": "",
             "direccion": "",
+            "direccion_linea1": "",
+            "direccion_linea2": "",
+            "direccion_linea3": "",
             "whatsapp": "",
         },
         "redes_sociales": {

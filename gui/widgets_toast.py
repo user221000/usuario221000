@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Sistema de notificaciones toast no intrusivas."""
 import customtkinter as ctk
 

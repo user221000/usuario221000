@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Ventana de gestión de clientes con historial y seguimiento.
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Widgets de progreso reutilizables para operaciones largas."""
 import customtkinter as ctk
 

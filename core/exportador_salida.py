@@ -15,6 +15,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from utils.helpers import resource_path
 from config.constantes import CARPETA_SALIDA, RUTA_LOGO
 from src.alimentos_base import ALIMENTOS_BASE
+from core.branding import branding
 
 # Registrar fuente Inter_18pt-BoldItalic para PDF (portabilidad total)
 _font_inter_bolditalic = resource_path("fonts/Inter_18pt-BoldItalic.ttf")
@@ -52,20 +53,20 @@ class GeneradorPDFProfesional:
         y_pos = header_top
         c.setFillColor(colors.black)
         c.setFont("Inter-BoldItalic", 16)
-        c.drawString(LEFT_MARGIN, y_pos, "FitnessGym Real del Valle")
+        c.drawString(LEFT_MARGIN, y_pos, branding.get('nombre_gym', 'Gimnasio'))
         y_pos -= 15
 
         c.setFont("Inter-BoldItalic", 9)
-        c.drawString(LEFT_MARGIN, y_pos, "C. Valle De San José 1329B")
+        c.drawString(LEFT_MARGIN, y_pos, branding.get('contacto.direccion_linea1', ''))
         y_pos -= 11
-        c.drawString(LEFT_MARGIN, y_pos, "Fraccionamiento Real del Valle")
+        c.drawString(LEFT_MARGIN, y_pos, branding.get('contacto.direccion_linea2', ''))
         y_pos -= 11
-        c.drawString(LEFT_MARGIN, y_pos, "45654 Tlajomulco de Zúñiga, Jal.")
+        c.drawString(LEFT_MARGIN, y_pos, branding.get('contacto.direccion_linea3', ''))
         y_pos -= 13
 
         c.setFont("Inter-BoldItalic", 8)
         c.setFillColor(colors.HexColor("#888888"))
-        c.drawString(LEFT_MARGIN, y_pos, "📷 @fitnessgym_realdelvalle")
+        c.drawString(LEFT_MARGIN, y_pos, f"📷 {branding.get('redes_sociales.instagram', '')}")
         y_pos -= 14
 
         # --- GYM LOGO RIGHT ---
@@ -84,7 +85,7 @@ class GeneradorPDFProfesional:
                 print(f"[ERROR] drawImage logo: {e}")
             c.setFont("Helvetica", 7)
             c.setFillColor(colors.gray)
-            c.drawRightString(page_width - LEFT_MARGIN, logo_y - 8, "Método Base by Consultoría Hernández")
+            c.drawRightString(page_width - LEFT_MARGIN, logo_y - 8, branding.get('tagline', ''))
 
         # --- SEPARATOR LINE ---
         c.setLineWidth(0.5)

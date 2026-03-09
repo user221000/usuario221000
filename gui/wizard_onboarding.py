@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Wizard de configuración inicial para primera instalación.
 

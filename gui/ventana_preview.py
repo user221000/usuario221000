@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Ventana modal de preview del plan nutricional antes de confirmar el PDF."""
 import customtkinter as ctk
 from typing import Callable

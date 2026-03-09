@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Reglas de validación de campos del formulario — sin dependencias de Tkinter."""
 
 
