@@ -511,3 +511,65 @@ class GestorBDClientes:
         except Exception as e:
             logger.error("[BD] Error limpiando backups: %s", e, exc_info=True)
             return 0
+
+    def obtener_todos_clientes(self, solo_activos: bool = False) -> list[dict]:
+        """Devuelve todos los clientes de la base de datos para exportación."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        try:
+            query = '''
+                SELECT id_cliente, nombre, telefono, email, edad,
+                       peso_kg, estatura_cm, grasa_corporal_pct,
+                       nivel_actividad, objetivo, fecha_registro,
+                       ultimo_plan, total_planes_generados, activo
+                FROM clientes
+            '''
+            if solo_activos:
+                query += ' WHERE activo = 1'
+            query += ' ORDER BY nombre ASC'
+
+            c.execute(query)
+            resultados = [dict(row) for row in c.fetchall()]
+            logger.info("[BD] Exportando todos los clientes: %s registros", len(resultados))
+            return resultados
+
+        except Exception as e:
+            logger.error("[BD] Error obteniendo todos los clientes: %s", e, exc_info=True)
+            return []
+
+        finally:
+            conn.close()
+
+    def obtener_planes_periodo(self,
+                               fecha_inicio: datetime,
+                               fecha_fin: datetime) -> list[dict]:
+        """Devuelve todos los planes generados en el período con nombre del cliente."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        try:
+            c.execute('''
+                SELECT
+                    c.nombre,
+                    p.fecha_generacion, p.kcal_objetivo, p.kcal_real,
+                    p.proteina_g, p.carbs_g, p.grasa_g, p.objetivo,
+                    p.peso_en_momento, p.grasa_en_momento,
+                    p.desviacion_maxima_pct, p.ruta_pdf
+                FROM planes_generados p
+                LEFT JOIN clientes c ON p.id_cliente = c.id_cliente
+                WHERE p.fecha_generacion BETWEEN ? AND ?
+                ORDER BY p.fecha_generacion DESC
+            ''', (fecha_inicio, fecha_fin))
+            resultados = [dict(row) for row in c.fetchall()]
+            logger.info("[BD] Planes período: %s registros", len(resultados))
+            return resultados
+
+        except Exception as e:
+            logger.error("[BD] Error obteniendo planes del período: %s", e, exc_info=True)
+            return []
+
+        finally:
+            conn.close()

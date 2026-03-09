@@ -370,7 +370,7 @@ class VentanaReportes(ctk.CTkToplevel):
         self._cargar_datos()
 
     def _exportar_reporte(self):
-        """Exporta el reporte a Excel."""
+        """Exporta el reporte a Excel con 5 hojas completas."""
         try:
             archivo = filedialog.asksaveasfilename(
                 defaultextension=".xlsx",
@@ -380,28 +380,99 @@ class VentanaReportes(ctk.CTkToplevel):
             if not archivo:
                 return
 
-            datos_reporte = {
-                "Resumen": pd.DataFrame([{
-                    "Total Clientes": self.stats.get("total_clientes", 0),
-                    "Clientes Nuevos": self.stats.get("clientes_nuevos", 0),
-                    "Planes Generados": self.stats.get("planes_periodo", 0),
-                    "Promedio Kcal": self.stats.get("promedio_kcal", 0),
-                }]),
-                "Top Clientes": pd.DataFrame(
-                    self.stats.get("top_clientes", [])
-                ),
-                "Objetivos": pd.DataFrame([
-                    {"Objetivo": k.title(), "Cantidad": v}
-                    for k, v in self.stats.get("objetivos", {}).items()
-                ]),
+            # ── Datos para hojas existentes ──
+            df_resumen = pd.DataFrame([{
+                "Total Clientes": self.stats.get("total_clientes", 0),
+                "Clientes Nuevos": self.stats.get("clientes_nuevos", 0),
+                "Planes Generados": self.stats.get("planes_periodo", 0),
+                "Promedio Kcal": self.stats.get("promedio_kcal", 0),
+            }])
+
+            top_raw = self.stats.get("top_clientes", [])
+            df_top = pd.DataFrame(top_raw)
+            if not df_top.empty:
+                df_top = df_top.rename(columns={
+                    "nombre": "Nombre",
+                    "planes": "Total Planes",
+                })
+
+            df_objetivos = pd.DataFrame([
+                {"Objetivo": k.title(), "Cantidad": v}
+                for k, v in self.stats.get("objetivos", {}).items()
+            ])
+
+            # ── Hoja: Todos los Clientes ──
+            todos_clientes = self.gestor_bd.obtener_todos_clientes(solo_activos=False)
+            df_clientes = pd.DataFrame(todos_clientes)
+            if not df_clientes.empty:
+                columnas_clientes = {
+                    "nombre": "Nombre",
+                    "telefono": "Teléfono",
+                    "email": "Email",
+                    "edad": "Edad",
+                    "peso_kg": "Peso (kg)",
+                    "objetivo": "Objetivo",
+                    "nivel_actividad": "Nivel Actividad",
+                    "total_planes_generados": "Total Planes",
+                    "ultimo_plan": "Último Plan",
+                    "activo": "Activo",
+                }
+                cols_disponibles = [c for c in columnas_clientes if c in df_clientes.columns]
+                df_clientes = df_clientes[cols_disponibles].rename(columns=columnas_clientes)
+            else:
+                df_clientes = pd.DataFrame(columns=[
+                    "Nombre", "Teléfono", "Email", "Edad", "Peso (kg)",
+                    "Objetivo", "Nivel Actividad", "Total Planes",
+                    "Último Plan", "Activo",
+                ])
+
+            # ── Hoja: Historial de Planes ──
+            periodo = self.combo_periodo.get()
+            fecha_inicio, fecha_fin = self._calcular_fechas_periodo(periodo)
+            planes_periodo = self.gestor_bd.obtener_planes_periodo(fecha_inicio, fecha_fin)
+            df_planes = pd.DataFrame(planes_periodo)
+            if not df_planes.empty:
+                columnas_planes = {
+                    "nombre": "Nombre Cliente",
+                    "fecha_generacion": "Fecha Generación",
+                    "kcal_objetivo": "Kcal Objetivo",
+                    "kcal_real": "Kcal Real",
+                    "proteina_g": "Proteína (g)",
+                    "carbs_g": "Carbohidratos (g)",
+                    "grasa_g": "Grasa (g)",
+                    "objetivo": "Objetivo",
+                    "peso_en_momento": "Peso en Momento",
+                    "grasa_en_momento": "Grasa en Momento",
+                    "desviacion_maxima_pct": "Desviación Máx (%)",
+                    "ruta_pdf": "Ruta PDF",
+                }
+                cols_disponibles = [c for c in columnas_planes if c in df_planes.columns]
+                df_planes = df_planes[cols_disponibles].rename(columns=columnas_planes)
+            else:
+                df_planes = pd.DataFrame(columns=[
+                    "Nombre Cliente", "Fecha Generación", "Kcal Objetivo",
+                    "Kcal Real", "Proteína (g)", "Carbohidratos (g)",
+                    "Grasa (g)", "Objetivo", "Peso en Momento",
+                    "Grasa en Momento", "Desviación Máx (%)", "Ruta PDF",
+                ])
+
+            # ── Escribir Excel ──
+            hojas = {
+                "Resumen": df_resumen,
+                "Top Clientes": df_top,
+                "Objetivos": df_objetivos,
+                "Todos los Clientes": df_clientes,
+                "Historial de Planes": df_planes,
             }
 
             if archivo.endswith(".xlsx"):
                 with pd.ExcelWriter(archivo, engine="xlsxwriter") as writer:
-                    for nombre_hoja, df in datos_reporte.items():
+                    for nombre_hoja, df in hojas.items():
                         df.to_excel(writer, sheet_name=nombre_hoja, index=False)
+                        worksheet = writer.sheets[nombre_hoja]
+                        worksheet.set_column(0, max(len(df.columns) - 1, 0), 18)
             elif archivo.endswith(".csv"):
-                datos_reporte["Resumen"].to_csv(archivo, index=False)
+                df_clientes.to_csv(archivo, index=False, encoding="utf-8-sig")
 
             messagebox.showinfo("Éxito", f"Reporte exportado exitosamente:\n{archivo}")
             logger.info("[REPORTES] Reporte exportado: %s", archivo)
