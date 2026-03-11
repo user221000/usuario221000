@@ -13,7 +13,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from utils.helpers import resource_path
-from config.constantes import CARPETA_SALIDA, RUTA_LOGO
+from config.constantes import CARPETA_SALIDA, CARPETA_PLANES, RUTA_LOGO
 from src.alimentos_base import ALIMENTOS_BASE
 from core.branding import branding
 
@@ -47,6 +47,7 @@ class GeneradorPDFProfesional:
         page_width, page_height = letter
         margin_x = 50
         header_top = page_height - 50
+        tagline = (branding.get('tagline', '') or '').strip()
 
         # --- GYM BRANDING LEFT ---
         LEFT_MARGIN = margin_x
@@ -57,6 +58,7 @@ class GeneradorPDFProfesional:
         y_pos -= 15
 
         c.setFont("Inter-BoldItalic", 9)
+        c.setFillColor(colors.HexColor("#333333"))
         c.drawString(LEFT_MARGIN, y_pos, branding.get('contacto.direccion_linea1', ''))
         y_pos -= 11
         c.drawString(LEFT_MARGIN, y_pos, branding.get('contacto.direccion_linea2', ''))
@@ -83,9 +85,10 @@ class GeneradorPDFProfesional:
                 )
             except Exception as e:
                 print(f"[ERROR] drawImage logo: {e}")
-            c.setFont("Helvetica", 7)
-            c.setFillColor(colors.gray)
-            c.drawRightString(page_width - LEFT_MARGIN, logo_y - 8, branding.get('tagline', ''))
+            if tagline:
+                c.setFont("Helvetica", 7)
+                c.setFillColor(colors.gray)
+                c.drawRightString(page_width - LEFT_MARGIN, logo_y - 8, tagline)
 
         # --- SEPARATOR LINE ---
         c.setLineWidth(0.5)
@@ -115,9 +118,16 @@ class GeneradorPDFProfesional:
         cliente_peso = getattr(cliente, 'peso_kg', '') or ''
         cliente_obj = getattr(cliente, 'objetivo', '').capitalize() if getattr(cliente, 'objetivo', None) else ''
         fecha_plan = datetime.now().strftime("%d %B %Y")
-        info_str = f"Cliente: {cliente_nombre}   Edad: {cliente_edad} años   Peso: {cliente_peso} kg   Objetivo: {cliente_obj}   Semana 1 | Fecha: {fecha_plan}"
-        c.drawString(margin_x, y_info, info_str)
-        return y_info - 28
+        info_linea_1 = (
+            f"Cliente: {cliente_nombre}   Edad: {cliente_edad} años   "
+            f"Peso: {cliente_peso} kg   Objetivo: {cliente_obj}"
+        )
+        info_linea_2 = f"Semana 1 | Fecha: {fecha_plan}"
+        c.drawString(margin_x, y_info, info_linea_1)
+        y_info -= 12
+        c.setFillColor(colors.HexColor("#555555"))
+        c.drawString(margin_x, y_info, info_linea_2)
+        return y_info - 20
 
     def _dibujar_recomendaciones(self, c, y_inicial):
         """Dibuja la sección de recomendaciones básicas."""
@@ -137,15 +147,21 @@ class GeneradorPDFProfesional:
             "(Ideal para controlar el apetito en etapas de déficit o mantenimiento)."
         ]
         for tip in tips:
-            c.drawString(60, y, f"• {tip}")
-            y -= 13
+            wrapped = textwrap.wrap(tip, width=92)
+            if not wrapped:
+                continue
+            c.drawString(60, y, f"• {wrapped[0]}")
+            y -= 12
+            for extra_line in wrapped[1:]:
+                c.drawString(72, y, extra_line)
+                y -= 12
         return y
 
     def _dibujar_disclaimer(self, c, page_width):
         """Disclaimer legal profesional al pie de página."""
         disclaimer = (
             "AVISO IMPORTANTE: Este plan nutricional es una guía general basada en objetivos de entrenamiento y composición corporal"
-            "No constituye una consulta médica ni nutricional profesional. Si usted padece enfermedades crónicas "
+            " No constituye una consulta médica ni nutricional profesional. Si usted padece enfermedades crónicas "
             " como diabetes, anemia, hipertensión u otras condiciones médicas, "
             "se recomienda consultar con un médico o nutriólogo certificado antes de seguir cualquier plan alimenticio."
         )
@@ -337,6 +353,10 @@ class GeneradorSalida:
             cliente_id = resultado_dict['cliente']['id']
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             nombre_archivo = f"plan_{cliente_id}_{timestamp}.json"
+
+        if not os.path.isabs(nombre_archivo):
+            os.makedirs(CARPETA_PLANES, exist_ok=True)
+            nombre_archivo = os.path.join(CARPETA_PLANES, nombre_archivo)
         
         with open(nombre_archivo, 'w', encoding='utf-8') as f:
             json.dump(resultado_dict, f, indent=2, ensure_ascii=False)

@@ -4,6 +4,7 @@ import os
 from logging.handlers import RotatingFileHandler
 
 
+
 class SistemaLogging:
     """Configura y provee un logger único para toda la aplicación."""
 
@@ -21,12 +22,9 @@ class SistemaLogging:
             SistemaLogging._logger = logger
             return logger
 
-        log_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "registros",
-        )
-        os.makedirs(log_dir, exist_ok=True)
-        log_file = os.path.join(log_dir, "metodo_base.log")
+        from config.constantes import CARPETA_REGISTROS
+        os.makedirs(CARPETA_REGISTROS, exist_ok=True)
+        log_file = os.path.join(CARPETA_REGISTROS, "metodo_base.log")
 
         fmt = "[%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s"
         datefmt = "%Y-%m-%d %H:%M:%S"

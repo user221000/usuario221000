@@ -10,6 +10,7 @@ from config.catalogo_alimentos import (
     categoria_de,
 )
 from utils.logger import logger
+from config.constantes import CARPETA_REGISTROS
 
 # Pesos de penalización por distancia al plan actual
 _PESOS_VENTANA = {0: 1.0, 1: 0.6, 2: 0.3}   # índice 0 = plan más reciente
@@ -52,7 +53,9 @@ class RotacionInteligenteAlimentos:
     def __init__(self, id_cliente: str, ventana_planes: int = 3):
         self.id_cliente = id_cliente
         self.ventana_planes = ventana_planes
-        self._archivo = f"registros/{id_cliente}_rotacion_inteligente.json"
+        self._archivo = os.path.join(
+            CARPETA_REGISTROS, f"{id_cliente}_rotacion_inteligente.json"
+        )
         self.historial: List[Dict[str, List[str]]] = self._cargar_historial()
         self.frecuencias: Dict[str, int] = self._calcular_frecuencias()
 
@@ -162,7 +165,7 @@ class RotacionInteligenteAlimentos:
         return []
 
     def _guardar_historial(self) -> None:
-        os.makedirs('registros', exist_ok=True)
+        os.makedirs(CARPETA_REGISTROS, exist_ok=True)
         with open(self._archivo, 'w', encoding='utf-8') as f:
             json.dump({'planes': self.historial}, f, indent=2, ensure_ascii=False)
 
@@ -199,7 +202,9 @@ class GestorRotacionAlimentos:
     def cargar_historial(self) -> None:
         """Carga historial de alimentos usados por este cliente."""
         try:
-            archivo_hist = f"registros/{self.id_cliente}_historial.json"
+            archivo_hist = os.path.join(
+                CARPETA_REGISTROS, f"{self.id_cliente}_historial.json"
+            )
             if os.path.exists(archivo_hist):
                 with open(archivo_hist, 'r', encoding='utf-8') as f:
                     datos = json.load(f)
@@ -288,9 +293,11 @@ class GestorRotacionAlimentos:
     
     def guardar_historial(self) -> None:
         """Guarda historial a archivo JSON."""
-        os.makedirs('registros', exist_ok=True)
+        os.makedirs(CARPETA_REGISTROS, exist_ok=True)
         
-        archivo_hist = f"registros/{self.id_cliente}_historial.json"
+        archivo_hist = os.path.join(
+            CARPETA_REGISTROS, f"{self.id_cliente}_historial.json"
+        )
         with open(archivo_hist, 'w', encoding='utf-8') as f:
             json.dump(self.historial_alimentos, f, indent=2, ensure_ascii=False)
     

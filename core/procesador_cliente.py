@@ -4,6 +4,7 @@ from datetime import datetime
 
 from config.constantes import (
     FACTORES_ACTIVIDAD, NIVELES_ACTIVIDAD, OBJETIVOS_VALIDOS, CARPETA_SALIDA,
+    CARPETA_PLANES,
 )
 from core.modelos import ClienteEvaluacion
 from core.motor_nutricional import MotorNutricional
@@ -285,7 +286,10 @@ class ProcesadorEvaluacion:
         
         generador = GeneradorSalida()
         resultado_dict = generador.a_dict(cliente, plan)
-        ruta_json = generador.guardar_json(resultado_dict, f"datos/{nombre_json}")
+        os.makedirs(CARPETA_PLANES, exist_ok=True)
+        ruta_json = generador.guardar_json(
+            resultado_dict, os.path.join(CARPETA_PLANES, nombre_json)
+        )
         print(f"      OK {ruta_json}")
         
         print("\n💾 BD: Registrando...")

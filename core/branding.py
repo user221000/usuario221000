@@ -13,11 +13,13 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
+from config.constantes import CARPETA_CONFIG
+
 
 class GestorBranding:
     """Lee / escribe la configuración de branding del gimnasio."""
 
-    ARCHIVO_BRANDING = "config/branding.json"
+    ARCHIVO_BRANDING = str(Path(CARPETA_CONFIG) / "branding.json")
 
     DEFAULTS: dict = {
         "nombre_gym": "",

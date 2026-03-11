@@ -65,6 +65,7 @@ class GeneradorPDFConOpciones:
         page_width, page_height = letter
         margin_x = 50
         header_top = page_height - 50
+        tagline = (branding.get('tagline', '') or '').strip()
 
         # Branding del gym (izquierda)
         y_pos = header_top
@@ -74,6 +75,7 @@ class GeneradorPDFConOpciones:
         y_pos -= 15
 
         c.setFont(_FONT, 9)
+        c.setFillColor(colors.HexColor("#333333"))
         c.drawString(margin_x, y_pos, branding.get('contacto.direccion_linea1', ''))
         y_pos -= 11
         c.drawString(margin_x, y_pos, branding.get('contacto.direccion_linea2', ''))
@@ -100,6 +102,10 @@ class GeneradorPDFConOpciones:
                 )
             except Exception:
                 pass
+            if tagline:
+                c.setFont("Helvetica", 7)
+                c.setFillColor(colors.gray)
+                c.drawRightString(page_width - margin_x, logo_y - 8, tagline)
 
         # Línea separadora
         c.setLineWidth(0.5)
@@ -131,13 +137,16 @@ class GeneradorPDFConOpciones:
         cliente_obj = (getattr(cliente, 'objetivo', '') or '').capitalize()
         fecha_plan = datetime.now().strftime("%d %B %Y")
 
-        info_str = (
+        info_linea_1 = (
             f"Cliente: {cliente_nombre}   Edad: {cliente_edad} años   "
-            f"Peso: {cliente_peso} kg   Objetivo: {cliente_obj}   "
-            f"Fecha: {fecha_plan}"
+            f"Peso: {cliente_peso} kg   Objetivo: {cliente_obj}"
         )
-        c.drawString(margin_x, y_pos, info_str)
-        y_pos -= 20
+        info_linea_2 = f"Fecha: {fecha_plan}"
+        c.drawString(margin_x, y_pos, info_linea_1)
+        y_pos -= 12
+        c.setFillColor(colors.HexColor("#555555"))
+        c.drawString(margin_x, y_pos, info_linea_2)
+        y_pos -= 18
 
         # Nota explicativa
         c.setFont(_FONT, 8)

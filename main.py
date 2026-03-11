@@ -47,7 +47,7 @@ splash.mainloop()
 # === IMPORTS ===
 from datetime import datetime
 
-from config.constantes import FACTORES_ACTIVIDAD, CARPETA_SALIDA
+from config.constantes import FACTORES_ACTIVIDAD, CARPETA_SALIDA, CARPETA_PLANES
 from core.modelos import ClienteEvaluacion
 from core.motor_nutricional import MotorNutricional
 from core.generador_planes import ConstructorPlanNuevo
@@ -135,7 +135,7 @@ if __name__ == "__main__":
         print("    (Modo Consola - instala customtkinter para GUI)")
         print("=" * 60)
         
-        os.makedirs("planes", exist_ok=True)
+        os.makedirs(CARPETA_PLANES, exist_ok=True)
         os.makedirs("datos", exist_ok=True)
         
         print("\nIngrese los datos del cliente:\n")
@@ -224,7 +224,7 @@ if __name__ == "__main__":
         
         cliente.factor_actividad = FACTORES_ACTIVIDAD.get(nivel, 1.2)
         cliente = MotorNutricional.calcular_motor(cliente)
-        plan = ConstructorPlanNuevo.construir(cliente, plan_numero=1, directorio_planes="planes")
+        plan = ConstructorPlanNuevo.construir(cliente, plan_numero=1, directorio_planes=CARPETA_PLANES)
         
         if not os.path.exists(CARPETA_SALIDA):
             os.makedirs(CARPETA_SALIDA)

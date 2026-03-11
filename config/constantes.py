@@ -1,8 +1,16 @@
 """Constantes y configuración global del sistema Método Base."""
 import os
+import sys
 from pathlib import Path
 
-from utils.helpers import resource_path
+
+def resource_path(relative_path: str) -> str:
+    """Resuelve rutas portables para PyInstaller y desarrollo."""
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
 
 # ============================================================================
@@ -149,16 +157,22 @@ EXPLICACION_OBJETIVOS = {
 
 
 # ============================================================================
-# RUTAS PARA PDF
+# RUTAS DE DATOS DE LA APP
 # ============================================================================
 
-try:
-    documentos_dir = str(Path.home() / "Documents")
-except Exception:
-    documentos_dir = os.path.expanduser("~")
+_appdata_root = os.getenv("APPDATA")
+if _appdata_root:
+    APP_DATA_DIR = Path(_appdata_root) / "MetodoBase"
+else:
+    APP_DATA_DIR = Path.home() / "AppData" / "Roaming" / "MetodoBase"
 
-CARPETA_SALIDA = os.path.join(documentos_dir, "PlanesPDF")
-os.makedirs(CARPETA_SALIDA, exist_ok=True)
+CARPETA_CONFIG = str(APP_DATA_DIR / "config")
+CARPETA_REGISTROS = str(APP_DATA_DIR / "registros")
+CARPETA_PLANES = str(APP_DATA_DIR / "planes")
+CARPETA_SALIDA = CARPETA_PLANES
+
+for carpeta in (CARPETA_CONFIG, CARPETA_REGISTROS, CARPETA_PLANES):
+    Path(carpeta).mkdir(parents=True, exist_ok=True)
 
 RUTA_LOGO = resource_path("assets/logo.png")
 

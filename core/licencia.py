@@ -15,6 +15,8 @@ from typing import Dict, Optional, Tuple
 
 from dotenv import load_dotenv
 
+from config.constantes import APP_DATA_DIR, CARPETA_CONFIG
+
 load_dotenv()
 
 
@@ -26,8 +28,8 @@ class GestorLicencias:
     SHA-256. El archivo ``licencia.lic`` se verifica al iniciar la app.
     """
 
-    ARCHIVO_LICENCIA = "licencia.lic"
-    ARCHIVO_CONFIG = "config/licencia_config.json"
+    ARCHIVO_LICENCIA = os.path.join(APP_DATA_DIR, "licencia.lic")
+    ARCHIVO_CONFIG = os.path.join(CARPETA_CONFIG, "licencia_config.json")
     SALT_MASTER: str = os.environ.get("METODO_BASE_SALT", "METODO_BASE_2026_CH")
 
     def __init__(self) -> None:
@@ -74,6 +76,7 @@ class GestorLicencias:
         duracion_dias: int = 365,
         email_contacto: str = "",
         telefono_contacto: str = "",
+        id_instalacion_cliente: str = None,
     ) -> str:
         """Genera una nueva licencia para *nombre_gym* y la guarda en disco."""
         if not nombre_gym or not nombre_gym.strip():
@@ -81,7 +84,7 @@ class GestorLicencias:
         if duracion_dias <= 0:
             raise ValueError("La duración debe ser mayor a 0 días")
 
-        id_instalacion = self._obtener_id_instalacion()
+        id_instalacion = id_instalacion_cliente or self._obtener_id_instalacion()
         fecha_emision = datetime.now()
         fecha_expiracion = fecha_emision + timedelta(days=duracion_dias)
 
@@ -217,6 +220,18 @@ def generar_licencia_cli() -> None:
         print("❌ Error: El nombre no puede estar vacío")
         return
 
+    print("\n🔐 ¿La licencia es para esta computadora (1) o para la PC de un cliente (2)?")
+    destino = input("Selecciona opción [1-2]: ").strip()
+    id_instalacion_cliente = None
+    if destino == "2":
+        id_instalacion_cliente = input("🆔 ID de instalación del cliente: ").strip()
+        if not id_instalacion_cliente:
+            print("❌ Error: El ID de instalación no puede estar vacío")
+            return
+    elif destino != "1":
+        print("❌ Opción inválida")
+        return
+
     email = input("📧 Email de contacto (opcional): ").strip()
     telefono = input("📱 Teléfono de contacto (opcional): ").strip()
 
@@ -243,6 +258,7 @@ def generar_licencia_cli() -> None:
         clave = gestor.generar_licencia_gym(
             nombre_gym=nombre_gym, duracion_dias=duracion,
             email_contacto=email, telefono_contacto=telefono,
+            id_instalacion_cliente=id_instalacion_cliente,
         )
         fecha_exp = (datetime.now() + timedelta(days=duracion)).strftime("%Y-%m-%d")
         print("\n" + "=" * 60)

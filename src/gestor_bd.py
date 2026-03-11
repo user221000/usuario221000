@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Tuple
 from pathlib import Path
 from utils.logger import logger
+from config.constantes import CARPETA_REGISTROS
 
 
 class GestorBDClientes:
@@ -30,7 +31,9 @@ class GestorBDClientes:
     - estadisticas_gym: métricas agregadas por mes
     """
 
-    def __init__(self, db_path: str = "registros/clientes.db"):
+    def __init__(self, db_path: str = None):
+        if db_path is None:
+            db_path = str(Path(CARPETA_REGISTROS) / "clientes.db")
         self.db_path = Path(db_path)
         self.backup_dir = self.db_path.parent / "backups"
 

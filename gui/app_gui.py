@@ -14,6 +14,7 @@ from PIL import Image, ImageTk, ImageFilter, ImageEnhance
 from utils.helpers import resource_path, abrir_carpeta_pdf
 from config.constantes import (
     FACTORES_ACTIVIDAD, NIVELES_ACTIVIDAD, OBJETIVOS_VALIDOS, CARPETA_SALIDA,
+    CARPETA_PLANES,
 )
 from core.modelos import ClienteEvaluacion
 from core.motor_nutricional import MotorNutricional
@@ -619,7 +620,7 @@ class GymApp(ctk.CTk):
             self._log(f"TMB={cliente.tmb:.0f}, GET={cliente.get_total:.0f}, Kcal={cliente.kcal_objetivo:.0f}")
             self.after(0, lambda: self.progress_indicator.set_progress(0.45, "Construyendo plan alimenticio…"))
 
-            dir_planes = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "planes")
+            dir_planes = CARPETA_PLANES
             os.makedirs(dir_planes, exist_ok=True)
 
             if tipo_plan == "Con Opciones":

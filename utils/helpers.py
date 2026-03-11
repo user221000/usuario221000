@@ -48,6 +48,9 @@ def cargar_plan_anterior_cliente(cliente_id: str, directorio_planes: str = ".") 
         dict: Último plan JSON encontrado o None si no existe
     """
     try:
+        if directorio_planes == ".":
+            from config.constantes import CARPETA_PLANES
+            directorio_planes = CARPETA_PLANES
         pattern = f"plan_{cliente_id}_*.json"
         archivos = glob.glob(os.path.join(directorio_planes, pattern))
         

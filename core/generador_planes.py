@@ -612,8 +612,9 @@ class ConstructorPlanNuevo:
 def ejecutar_demo_gym():
     """Demo completa del sistema de generación de planes nutricionales."""
     from core.exportador_salida import GeneradorPDFProfesional
+    from config.constantes import CARPETA_PLANES
     
-    os.makedirs("planes", exist_ok=True)
+    os.makedirs(CARPETA_PLANES, exist_ok=True)
     os.makedirs("datos", exist_ok=True)
     
     clientes_config = [
@@ -657,7 +658,7 @@ def ejecutar_demo_gym():
         kcal_ajustado, ajuste_aplicado = AjusteCaloricoMensual.aplicar_ajuste(
             cliente_id=cliente.id_cliente, peso_actual=cliente.peso_kg,
             objetivo=cliente.objetivo, kcal_objetivo_base=cliente.kcal_objetivo,
-            plan_anterior=None, directorio_planes="planes"
+            plan_anterior=None, directorio_planes=CARPETA_PLANES
         )
         logger.info("[3] Kcal ajustado: %.0f | Ajuste: %s", kcal_ajustado, ajuste_aplicado)
         
@@ -668,7 +669,7 @@ def ejecutar_demo_gym():
                     distribucion['desayuno']['kcal'], distribucion['almuerzo']['kcal'],
                     distribucion['comida']['kcal'], distribucion['cena']['kcal'])
         
-        plan = ConstructorPlanNuevo.construir(cliente, plan_numero=1, directorio_planes="planes")
+        plan = ConstructorPlanNuevo.construir(cliente, plan_numero=1, directorio_planes=CARPETA_PLANES)
         
         es_valido, errores = MealStructureContract.validar_plan_completo(plan)
         if es_valido:
